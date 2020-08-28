@@ -23,3 +23,20 @@ map_sizes_from_scale = {
     100000 : [0.66667,0.025],
     200000 : [1.33333,0.0125]
 }
+
+max_extent = [9.7008,53.363,10.3435,53.7383] # xmin, ymin, xmax, ymax
+type_filter = ["P"] # possible values subset of ["A","H","L","P","R","S","T","U","V"]
+
+
+miss_probability = 0.3
+word_split_probability = 0.8
+
+strip_first_probability = 0.2
+strip_last_probability = 0.2
+umlaut_conversion_probability = 0.6
+ocr_character_error_probability = 0.1
+ocr_single_char_errors = {
+    "f" : "t",
+    "m" : "rn",
+    "t" : "f"
+}

@@ -24,7 +24,7 @@ def sample_bboxes(tablename, max_extent, map_size, number_samples, type_filter=[
     # get contents for a range of bboxes
     result_set = []
     
-    for n in range(number_samples):
+    for _ in range(number_samples):
         bbox = make_random_bbox(max_extent, map_size)
         bbox_result = query_bbox(config.db_table, bbox, type_filter)
         result_set.append((bbox, bbox_result))
@@ -65,13 +65,62 @@ def points_to_geojson(filename, list_points, list_properties):
     with open(filename, "w", encoding="utf-8") as file:
         file.write(outstring)
 
-max_extent = [9.7008,53.363,10.3435,53.7383] # xmin, ymin, xmax, ymax
-type_filter = ["P"]
+def degrade_toponym(word):
 
-samples = sample_bboxes(config.db_table,max_extent,config.map_sizes_from_scale[25000],4,type_filter)
+    if random.uniform(0,1) <= config.strip_first_probability:
+        word = word[1:]
+    if random.uniform(0,1) <= config.strip_last_probability:
+        word = word[:-1]
+    if random.uniform(0,1) <= config.umlaut_conversion_probability:
+        word = word.replace("ä","a")
+        word = word.replace("ö","o")
+        word = word.replace("ü","u")
+        word = word.replace("ß","f")
+    newword = ""
+    for c in word:
+        if random.uniform(0,1) <= config.ocr_character_error_probability:
+            newword += config.ocr_single_char_errors.get(c,c)
+        else:
+            newword += c
+    word= newword
 
-points = list(map(lambda s: s[1:3],samples[0][1]))
-props = list(map(lambda s: dict(zip(["name","feature_code"],[s[0]]+list(s[3:]))),samples[0][1]))
-print(props)
-points_to_geojson("test.json",points,props)
-bbox_to_geojson("bbox.json",samples[0][0])
+
+    return word
+
+def degrade_samples(samples):
+
+    degraded_samples = []
+    for sample in samples:
+        places = sample[1]
+        newplaces = []
+        for place in places:
+            if random.uniform(0,1) <= config.miss_probability:
+                continue
+            if " " in place[0]:
+                if random.uniform(0,1) <= config.word_split_probability:
+                    # split word(s)
+                    split_places = [ [degrade_toponym(w),*place[1:],place[0]] for w in place[0].split(" ")]
+                    # print(newplaces)
+                    newplaces += split_places
+                    continue
+            
+            newplace = (degrade_toponym(place[0]),*place[1:],place[0])
+            newplaces.append(newplace)
+            
+        
+        newsample = (sample[0],newplaces)
+        print(newsample)
+        degraded_samples.append(newsample)
+
+    return degraded_samples
+
+n_samples = 4
+samples = sample_bboxes(config.db_table,config.max_extent,config.map_sizes_from_scale[25000],n_samples,config.type_filter)
+samples = degrade_samples(samples)
+
+for i,sample in enumerate(samples):
+    path = "data"
+    points = list(map(lambda s: s[1:3], sample[1]))
+    props = list(map(lambda s: dict(zip(["text","feature_code","name"],[s[0]]+list(s[3:]))), sample[1]))
+    points_to_geojson("%s/points_%d.json" %(path,i), points,props)
+    bbox_to_geojson("%s/bbox_%d.json" %(path,i), sample[0])
