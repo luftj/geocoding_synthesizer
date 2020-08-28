@@ -1,22 +1,15 @@
 import psycopg2
 import sys
 
-db_creds = {
-    "host": "192.168.13.7",
-    "port" : 5432,
-    "dbname" : "geocode",
-    "user": "postgres",
-    "password": "enteente",
-}
-
+import config
 
 conn = None
 # connect to DB with values read from DBconfig.json
 def connectDB():
     try:
         global conn
-        print(*db_creds.values())
-        conn = psycopg2.connect("host={} port={} dbname={} user={} password={}".format(*db_creds.values()))
+        print(*config.db_creds.values())
+        conn = psycopg2.connect("host={} port={} dbname={} user={} password={}".format(*config.db_creds.values()))
         
     except:
         print(sys.exc_info()[0])
