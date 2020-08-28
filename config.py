@@ -29,7 +29,7 @@ type_filter = ["P"] # possible values subset of ["A","H","L","P","R","S","T","U"
 
 
 miss_probability = 0.3
-word_split_probability = 0.8
+word_split_probability = 1
 
 strip_first_probability = 0.2
 strip_last_probability = 0.2
@@ -38,5 +38,6 @@ ocr_character_error_probability = 0.1
 ocr_single_char_errors = {
     "f" : "t",
     "m" : "rn",
-    "t" : "f"
+    "t" : "f",
+    "R" : "B"
 }

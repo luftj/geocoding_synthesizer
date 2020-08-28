@@ -94,20 +94,20 @@ def degrade_samples(samples):
         places = sample[1]
         newplaces = []
         for place in places:
+            name = place[0]
             if random.uniform(0,1) <= config.miss_probability:
                 continue
-            if " " in place[0]:
+            if (" " in name) or ("-" in name):
                 if random.uniform(0,1) <= config.word_split_probability:
+                    tosplit = name.replace("-"," ")
                     # split word(s)
-                    split_places = [ [degrade_toponym(w),*place[1:],place[0]] for w in place[0].split(" ")]
-                    # print(newplaces)
+                    split_places = [ [degrade_toponym(w), *place[1:], name] for w in tosplit.split(" ")]
                     newplaces += split_places
                     continue
-            
-            newplace = (degrade_toponym(place[0]),*place[1:],place[0])
+
+            newplace = (degrade_toponym(name),*place[1:],name)
             newplaces.append(newplace)
             
-        
         newsample = (sample[0],newplaces)
         print(newsample)
         degraded_samples.append(newsample)
