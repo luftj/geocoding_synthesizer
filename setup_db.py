@@ -1,4 +1,5 @@
 import argparse
+
 from database import query_database,create_table_from_csv,create_table
 import config
 

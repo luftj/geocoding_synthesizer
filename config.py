@@ -24,12 +24,15 @@ map_sizes_from_scale = {
     200000 : [1.33333,0.0125]
 }
 
-max_extent = [9.7008,53.363,10.3435,53.7383] # xmin, ymin, xmax, ymax
+max_extent = [6.0,47.37,15.01,55.18] # xmin, ymin, xmax, ymax
+# HH: [9.7008,53.363,10.3435,53.7383] 
+# iowa: [-96.8037,40.3313,-90.135,43.5659]
 type_filter = ["P"] # possible values subset of ["A","H","L","P","R","S","T","U","V"]
-
+countrycode = "DE"
+n_samples = 250
 
 miss_probability = 0.3
-word_split_probability = 1
+word_split_probability = 0.8
 
 strip_first_probability = 0.2
 strip_last_probability = 0.2

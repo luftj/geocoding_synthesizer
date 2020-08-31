@@ -1,2 +1,6 @@
 psycopg2
 argparse
+requests
+numpy
+matplotlib
+sklearn

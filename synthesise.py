@@ -1,4 +1,5 @@
 import random
+
 from database import query_database
 import config
 
@@ -59,14 +60,14 @@ def points_to_geojson(filename, list_points, list_properties):
         outstring += ', '.join(props)
         outstring += ' } },'
 
-    outstring = outstring[:-1] # remove trailing comma
+    if len(list_points) > 0:
+        outstring = outstring[:-1] # remove trailing comma
     outstring += ' ] }'
 
     with open(filename, "w", encoding="utf-8") as file:
         file.write(outstring)
 
 def degrade_toponym(word):
-
     if random.uniform(0,1) <= config.strip_first_probability:
         word = word[1:]
     if random.uniform(0,1) <= config.strip_last_probability:
@@ -82,13 +83,11 @@ def degrade_toponym(word):
             newword += config.ocr_single_char_errors.get(c,c)
         else:
             newword += c
-    word= newword
-
+    word = newword
 
     return word
 
 def degrade_samples(samples):
-
     degraded_samples = []
     for sample in samples:
         places = sample[1]
@@ -114,13 +113,13 @@ def degrade_samples(samples):
 
     return degraded_samples
 
-n_samples = 4
-samples = sample_bboxes(config.db_table,config.max_extent,config.map_sizes_from_scale[25000],n_samples,config.type_filter)
-samples = degrade_samples(samples)
+if __name__ == "__main__":
+    samples = sample_bboxes(config.db_table, config.max_extent, config.map_sizes_from_scale[25000], config.n_samples, config.type_filter)
+    samples = degrade_samples(samples)
 
-for i,sample in enumerate(samples):
-    path = "data"
-    points = list(map(lambda s: s[1:3], sample[1]))
-    props = list(map(lambda s: dict(zip(["text","feature_code","name"],[s[0]]+list(s[3:]))), sample[1]))
-    points_to_geojson("%s/points_%d.json" %(path,i), points,props)
-    bbox_to_geojson("%s/bbox_%d.json" %(path,i), sample[0])
+    for i, sample in enumerate(samples):
+        path = "data"
+        points = list(map(lambda s: s[1:3], sample[1]))
+        props = list(map(lambda s: dict(zip(["text","feature_code","name"],[s[0]]+list(s[3:]))), sample[1]))
+        points_to_geojson("%s/points_%d.json" %(path,i), points, props)
+        bbox_to_geojson("%s/bbox_%d.json" %(path,i), sample[0])
